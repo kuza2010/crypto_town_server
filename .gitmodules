@@ -1,0 +1,3 @@
+[submodule "cnn/ad_net"]
+	path = cnn/ad_net
+	url = https://github.com/kuza2010/ad_net
