@@ -13,6 +13,10 @@ dependencies {
     // core
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
     implementation 'com.sparkjava:spark-core:2.9.3'
+
+    // add support for pgm image
+    implementation 'com.twelvemonkeys.imageio:imageio-pnm:3.7.0'
+
     // logger
     implementation 'org.slf4j:slf4j-simple:2.0.0-alpha1'
     // google gson

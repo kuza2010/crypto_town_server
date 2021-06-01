@@ -12,15 +12,17 @@ object ConfigReader {
                 inputStream?.let {
                     val prop = Properties()
                     prop.load(inputStream)
+
+                    if (!prop.containsKey("script.path")) {
+                        throw InstantiationException("Can not instantiate app without script.path property")
+                    }
+                    if (!prop.containsKey("cnn.model.path")) {
+                        throw InstantiationException("Can not instantiate app without script.model property")
+                    }
+
                     return@use prop
                 }
-                Properties().apply {
-                    put("server.port", "8080")
-                    put("server.author", "kuza2010")
-
-                    put("files.max-size.mb", 1)
-                    put("files.temp.dir", "files_to_process")
-                }
+                throw InstantiationException("Can not instantiate app without application.property file")
             }
     }
 }

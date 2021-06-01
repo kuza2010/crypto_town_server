@@ -7,5 +7,8 @@ class EmptyFileException(fileName: String) : FileException("File with name $file
 
 class FileToBigException(fileName: String) : FileException("File with name $fileName is too big") {}
 
-class FileMimeTypeException(fileName: String) : FileException("File with name $fileName is not image") {}
+class FileMimeTypeException(fileName: String) : FileException("File with name $fileName is not valid image") {}
+
+class FileResolutionException(fileName: String, supportedResolution: Int) :
+    FileException("File with name $fileName has unsupported resolution. Only $supportedResolution x $supportedResolution supported") {}
 

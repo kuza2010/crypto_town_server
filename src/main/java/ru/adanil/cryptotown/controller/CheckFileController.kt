@@ -1,10 +1,10 @@
 package ru.adanil.cryptotown.controller
 
-import ru.adanil.cryptotown.FileCheckServiceImpl
-import ru.adanil.cryptotown.IFileCheckService
 import ru.adanil.cryptotown.exception.EmptyFileException
 import ru.adanil.cryptotown.exception.FileMimeTypeException
 import ru.adanil.cryptotown.exception.FileToBigException
+import ru.adanil.cryptotown.service.FileCheckService
+import ru.adanil.cryptotown.service.impl.filechecker.FileCheckServiceImpl
 import ru.adanil.cryptotown.utils.ConfigReader
 import spark.Request
 import spark.Response
@@ -17,8 +17,9 @@ class CheckFileController : Route {
         const val UPLOAD_ATTR = "org.eclipse.jetty.multipartConfig"
     }
 
-    private val fileCheckerService: IFileCheckService = FileCheckServiceImpl()
-    private val maxFileSize = ConfigReader.properties.getProperty("files.max-size.mb").toInt() * 1024 * 1024 * 8
+    private val fileCheckerService: FileCheckService = FileCheckServiceImpl()
+    private val maxFileSize =
+        ConfigReader.properties.getProperty("files.max-size.mb").toInt() * 1024 * 1024 * 8    //1 mb in bytes
 
 
     override fun handle(
@@ -35,14 +36,17 @@ class CheckFileController : Route {
         if (filePart.size > maxFileSize) {
             throw FileToBigException(fileName)
         }
-        if (!filePart.contentType.contains("image")) {
+        if (!fileName.endsWith(".pgm")) {
             throw FileMimeTypeException(fileName)
         }
 
-        fileCheckerService.checkFile(request.raw().getPart("image").inputStream, fileName)
+        val status = request.raw()
+            .getPart("image").inputStream
+            .use { fileCheckerService.checkFile(it, fileName) }
+
         response.type("application/json")
         response.header("Access-Control-Allow-Origin", "*")
-
-        return mapOf("status" to "File uploaded!")
+        return status
     }
+
 }
