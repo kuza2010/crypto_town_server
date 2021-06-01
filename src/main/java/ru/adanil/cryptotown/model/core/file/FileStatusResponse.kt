@@ -1,6 +1,6 @@
 package ru.adanil.cryptotown.model.core.file
 
-import ru.adanil.cryptotown.utils.ScriptExecutor
+import ru.adanil.cryptotown.utils.scripts.ScriptResponse
 
 data class FileStatusResponse(
     val fileName: String,
@@ -8,7 +8,7 @@ data class FileStatusResponse(
     val extras: Map<String, Any>? = null
 ) {
     companion object {
-        fun fromScriptResponse(scriptResponse: ScriptExecutor.ScriptResponse): FileStatusResponse {
+        fun fromScriptResponse(scriptResponse: ScriptResponse): FileStatusResponse {
             val probes = scriptResponse.probability.split("/")
             return if (probes.size == 2) {
                 FileStatusResponse(

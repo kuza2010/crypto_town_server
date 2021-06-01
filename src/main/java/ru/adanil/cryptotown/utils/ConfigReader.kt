@@ -25,4 +25,5 @@ object ConfigReader {
                 throw InstantiationException("Can not instantiate app without application.property file")
             }
     }
+
 }

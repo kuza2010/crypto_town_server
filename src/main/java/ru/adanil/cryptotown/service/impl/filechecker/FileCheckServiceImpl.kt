@@ -5,8 +5,8 @@ import ru.adanil.cryptotown.exception.FileResolutionException
 import ru.adanil.cryptotown.model.core.file.FileStatusResponse
 import ru.adanil.cryptotown.service.FileCheckService
 import ru.adanil.cryptotown.utils.ConfigReader
-import ru.adanil.cryptotown.utils.ScriptArgument
-import ru.adanil.cryptotown.utils.ScriptExecutor
+import ru.adanil.cryptotown.utils.scripts.ScriptArgument
+import ru.adanil.cryptotown.utils.scripts.ScriptExecutor
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
@@ -42,8 +42,9 @@ class FileCheckServiceImpl(
         fileName: String
     ): FileStatusResponse {
         val storedImage = saveToFile(content, fileName)
+        val bufferedImage = ImageIO.read(storedImage)
 
-        when (fileCompatibilityChecker.check(ImageIO.read(storedImage))) {
+        when (fileCompatibilityChecker.check(bufferedImage)) {
             CompatibilityChecker.CheckResult.OK -> {
                 val args = listOf(
                     ScriptArgument("-i", storedImage.absolutePath),
@@ -58,9 +59,6 @@ class FileCheckServiceImpl(
             }
             CompatibilityChecker.CheckResult.IMAGE_TYPE_UNSUPPORTED -> {
                 throw FileMimeTypeException(fileName)
-            }
-            else -> {
-                TODO()
             }
         }
     }
