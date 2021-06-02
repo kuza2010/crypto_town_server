@@ -45,21 +45,9 @@ class FileCheckServiceImpl(
         val bufferedImage = ImageIO.read(storedImage)
 
         when (fileCompatibilityChecker.check(bufferedImage)) {
-            CompatibilityChecker.CheckResult.OK -> {
-                val args = listOf(
-                    ScriptArgument("-i", storedImage.absolutePath),
-                    ScriptArgument("-m", modelPath)
-                )
-                val executionResult = ScriptExecutor().execute(scriptPath, args)
-
-                return FileStatusResponse.fromScriptResponse(executionResult)
-            }
-            CompatibilityChecker.CheckResult.IMAGE_SIZE_UNSUPPORTED -> {
-                throw FileResolutionException(fileName, supportedImageSize)
-            }
-            CompatibilityChecker.CheckResult.IMAGE_TYPE_UNSUPPORTED -> {
-                throw FileMimeTypeException(fileName)
-            }
+            CompatibilityChecker.CheckResult.OK                     -> return process(storedImage)
+            CompatibilityChecker.CheckResult.IMAGE_SIZE_UNSUPPORTED -> throw FileResolutionException(fileName, supportedImageSize)
+            CompatibilityChecker.CheckResult.IMAGE_TYPE_UNSUPPORTED -> throw FileMimeTypeException(fileName)
         }
     }
 
@@ -73,4 +61,22 @@ class FileCheckServiceImpl(
         return tmpFile
     }
 
+    private fun process(image: File): FileStatusResponse {
+        try {
+            val args = listOf(
+                ScriptArgument("-m", modelPath),
+                ScriptArgument("-i", image.absolutePath)
+            )
+            val executionResult = ScriptExecutor().execute(scriptPath, args)
+            return FileStatusResponse.fromScriptResponse(executionResult)
+        } finally {
+            tearDown(image)
+        }
+    }
+
+    private fun tearDown(file: File) {
+        if (file.exists()) {
+            file.delete()
+        }
+    }
 }
